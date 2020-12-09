@@ -112,7 +112,6 @@ if __name__ == '__main__':
     length =  m.floor(len(df)/size)
     X = df[rank*length:rank*length+length][[0,1,2,3]] 
     X = np.array(X)
-    print(len(X))
     y = df[:][[4]]
     y = np.array(y)
     start = timer()

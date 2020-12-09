@@ -87,7 +87,6 @@ if __name__ == '__main__':
     df = pd.read_csv('data.txt', sep=",", header=None)
     X = df[:][[0,1,2,3]] 
     X = np.array(X)
-    print(len(X))
     y = df[:][[4]]
     y = np.array(y)
     start = timer()
