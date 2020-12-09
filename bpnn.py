@@ -39,7 +39,7 @@ class NeuralNetwork:
         r = 2*np.random.random( (layers[i] + 1, layers[i+1])) - 1
         self.weights.append(r)
 
-    def fit(self, X, y,size, rank, comm, learning_rate=0.2, epochs=100):
+    def fit(self, X, y,size, rank, comm, learning_rate=0.2, epochs=1):
         # Add column of ones to X
         # This is to add the bias unit to the input layer
         ones = np.atleast_2d(np.ones(X.shape[0]))
@@ -86,15 +86,13 @@ class NeuralNetwork:
                 for i in range(1, size):
                     for j in range(0,len(data[i])):
                         self.weights[j] = self.weights[j] + data[i][j]
-                        # print(data[i][j],"\n")
-                        # print(data[i][j] + data[i][j])
-                        # print()
+
                 sendbuf = self.weights
-            sendbuf = comm.scatter(sendbuf, root=0)
+            sendbuf = comm.bcast(sendbuf, root=0)
                 # if k % 10000 == 0: print ('epochs:', k)
             if rank!=0:
-                for i in sendbuf:
-                    self.weigths = i
+                self.weights = sendbuf
+
                     
     def predict(self, x): 
         a = np.concatenate((np.ones(1), np.array(x)), axis=0).T     
