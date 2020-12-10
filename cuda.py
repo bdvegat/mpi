@@ -37,44 +37,41 @@ class NeuralNetwork:
         r = 2*np.random.random( (layers[i] + 1, layers[i+1])) - 1
         self.weights.append(r)
 
-    def fit(self, X, y, learning_rate=0.002, epochs=1):
+    def fit(self, X, y, learning_rate=0.002, epochs=10000):
         # Add column of ones to X
         # This is to add the bias unit to the input layer
         ones = np.atleast_2d(np.ones(X.shape[0]))
         X = np.concatenate((ones.T, X), axis=1)
         
         for k in range(epochs):
-            for i in range(len(X)):
-                a = [X[i]]
-                for l in range(len(self.weights)):
-                        dot_value = np.dot(a[l], self.weights[l])
-                        activation = self.activation(dot_value)
-                        a.append(activation)
 
-                # output layer
-                error = y[i] - a[-1]
-                deltas = [error * self.activation_prime(a[-1])]
+            a = [X]
+            for l in range(len(self.weights)):
+                    dot_value = np.dot(a[l], self.weights[l])
+                    activation = self.activation(dot_value)
+                    a.append(activation)
 
-                # we need to begin at the second to last layer 
-                # (a layer before the output layer)
-                for l in range(len(a) - 2, 0, -1): 
-                    deltas.append(deltas[-1].dot(self.weights[l].T)*self.activation_prime(a[l]))
-                    
+            # output layer
+            error = y - a[-1]
+            deltas = [error * self.activation_prime(a[-1])]
+            # we need to begin at the second to last layer 
+            # (a layer before the output layer)
+            for l in range(len(a) - 2, 0, -1): 
+                deltas.append(deltas[-1].dot(self.weights[l].T)*self.activation_prime(a[l]))
 
-                # reverse
-                # [level3(output)->level2(hidden)]  => [level2(hidden)->level3(output)]
-                deltas.reverse()
+            # reverse
+            # [level3(output)->level2(hidden)]  => [level2(hidden)->level3(output)]
+            deltas.reverse()
 
             # backpropagation
             # 1. Multiply its output delta and input activation 
             #    to get the gradient of the weight.
             # 2. Subtract a ratio (percentage) of the gradient from the weight.
-                for i in range(len(self.weights)):
-                    layer = np.atleast_2d(a[i])
-                    delta = np.atleast_2d(deltas[i])
-                    self.weights[i] += learning_rate * layer.T.dot(delta)
-
-            # if k % 10000 == 0: print ('epochs:', k)
+            for i in range(len(self.weights)):
+                layer = np.atleast_2d(a[i])
+                delta = np.atleast_2d(deltas[i])
+                self.weights[i] += learning_rate * layer.T.dot(delta)/len(delta[i])
+        # if k % 10000 == 0: print ('epochs:', k)
 
     def predict(self, x): 
         a = np.concatenate((np.ones(1), np.array(x)), axis=0).T     
@@ -93,8 +90,9 @@ if __name__ == '__main__':
     nn.fit(X, y)
     end = timer()
     print(end - start)
+    
     # for e in X:
     #     print(e,nn.predict(e))
-
-
+    #2.0177,1.7982,-2.9581,0.2099,1
+    #0.49571,10.2243,-1.097,-4.0159,0
 # ...
