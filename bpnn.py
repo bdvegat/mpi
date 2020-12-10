@@ -77,9 +77,6 @@ class NeuralNetwork:
                     self.weights[i] += learning_rate * layer.T.dot(delta)
 
             data = self.weights
-            # for i in data:
-            #     print(i)
-            #     print (i+i)
             data = comm.gather(data, root=0)
             sendbuf = None
             if rank == 0:
@@ -89,7 +86,7 @@ class NeuralNetwork:
 
                 sendbuf = self.weights
             sendbuf = comm.bcast(sendbuf, root=0)
-                # if k % 10000 == 0: print ('epochs:', k)
+
             if rank!=0:
                 self.weights = sendbuf
 

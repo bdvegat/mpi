@@ -45,7 +45,6 @@ class NeuralNetwork:
         
         for k in range(epochs):
             for i in range(len(X)):
-                i = np.random.randint(X.shape[0])
                 a = [X[i]]
                 for l in range(len(self.weights)):
                         dot_value = np.dot(a[l], self.weights[l])
